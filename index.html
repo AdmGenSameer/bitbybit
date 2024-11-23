@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bit by Bit - Welcome</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #webgl-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .brand-logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .menu-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .menu-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .intro-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .intro-section h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards;
+        }
+
+        .intro-section p {
+            font-size: 1.5rem;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards 0.5s;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            color: white;
+            text-align: center;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="webgl-background"></div>
+    
+    <nav>
+        <a href="#" class="brand-logo">BitByBit Club</a>
+        <div class="menu-links">
+            <a href="#about">About</a>
+            <a href="#join">Join</a>
+            <a href="#events">Events</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
+
+    <section class="intro-section">
+        <h1>Welcome to BitByBit Club</h1>
+        <p>Exploring the digital frontier, one bit at a time.</p>
+    </section>
+
+    <footer>
+        <p>© 2024 Bit by Bit. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Initialize Three.js
+        const clubScene = new THREE.Scene();
+        const clubCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const backgroundRenderer = new THREE.WebGLRenderer({ antialias: true });
+        backgroundRenderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('webgl-background').appendChild(backgroundRenderer.domElement);
+
+        // Create animated objects
+        const animatedObjects = [];
+        for (let i = 0; i < 50; i++) {
+            const objectGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const objectMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(`hsl(${Math.random() * 360}, 50%, 50%)`),
+                wireframe: true
+            });
+            const animatedCube = new THREE.Mesh(objectGeometry, objectMaterial);
+            
+            animatedCube.position.x = Math.random() * 40 - 20;
+            animatedCube.position.y = Math.random() * 40 - 20;
+            animatedCube.position.z = Math.random() * 40 - 20;
+            
+            animatedCube.rotation.x = Math.random() * Math.PI;
+            animatedCube.rotation.y = Math.random() * Math.PI;
+            
+            animatedObjects.push({
+                object: animatedCube,
+                rotationSpeed: {
+                    x: (Math.random() - 0.5) * 0.02,
+                    y: (Math.random() - 0.5) * 0.02
+                }
+            });
+            
+            clubScene.add(animatedCube);
+        }
+
+        clubCamera.position.z = 15;
+
+        // Animation loop
+        function renderAnimation() {
+            requestAnimationFrame(renderAnimation);
+            
+            animatedObjects.forEach(animatedCube => {
+                animatedCube.object.rotation.x += animatedCube.rotationSpeed.x;
+                animatedCube.object.rotation.y += animatedCube.rotationSpeed.y;
+            });
+            
+            backgroundRenderer.render(clubScene, clubCamera);
+        }
+
+        // Adjust for resizing
+        window.addEventListener('resize', () => {
+            clubCamera.aspect = window.innerWidth / window.innerHeight;
+            clubCamera.updateProjectionMatrix();
+            backgroundRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        renderAnimation();
+
+        // Parallax mouse effect
+        document.addEventListener('mousemove', (event) => {
+            const cursorX = (event.clientX / window.innerWidth) * 2 - 1;
+            const cursorY = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            clubCamera.position.x += (cursorX - clubCamera.position.x) * 0.05;
+            clubCamera.position.y += (cursorY - clubCamera.position.y) * 0.05;
+            clubCamera.lookAt(clubScene.position);
+        });
+    </script>
+</body>
+</html>
